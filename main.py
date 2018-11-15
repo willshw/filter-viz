@@ -37,12 +37,20 @@ class Filter:
 
         return self._filter.getPredictiedStates()
 
-
 def main():
 
     print 'Press Ctrl+C to quit.'
     
-    kf = Filter(FITLER_TYPE) 
+    kf = Filter(FITLER_TYPE)
+
+    win = pg.GraphicsWindow(title='Filter')
+    p = win.addPlot()
+    p.setXRange(0, 1920)
+    p.setYRange(0, 1080)
+    p.getViewBox().invertY(True)
+    
+    plot_measure = p.plot([], [], pen=None, symbol='o', symbolBrush=(255, 100, 100, 50))
+    plot_predict = p.plot([], [], pen=None, symbol='o', symbolBrush=(100, 100, 255, 50))
 
     try:
         while True:
@@ -51,6 +59,10 @@ def main():
             Y = kf.getMeasuredStates()
             X = kf.getPredictiedStates()
 
+            plot_measure.setData([int(Y[0,0])], [int(Y[1,0])])
+            plot_predict.setData([X[0,0]], [X[1,0]])
+            QtGui.QApplication.processEvents()
+            
             positionStr = 'X: {0:d} Y: {1:d} Xp: {2:.2f} Yp: {3:.2f}'.format(int(Y[0,0]), int(Y[1,0]), X[0,0], X[1,0])
             print positionStr,
             print '\b' * (len(positionStr) + 2),

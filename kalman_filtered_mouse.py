@@ -46,7 +46,7 @@ class KalmanFilteredMouse:
 
         self._C = np.identity(4)
         self._C[0,2] = 1
-        self._C[0,3] = 1
+        self._C[1,3] = 1
 
         self._Q = np.zeros((4, 4))
         self._Q[2,2] = 0.1
