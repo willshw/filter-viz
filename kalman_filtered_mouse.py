@@ -3,7 +3,7 @@ import pyautogui
 import numpy as np
 
 # KalmanFilter class handles all the calculation in the kalman filter
-class KalmanMouse:
+class KalmanFilteredMouse:
 
     def __init__(self):
         """
@@ -69,18 +69,16 @@ class KalmanMouse:
         self._time_curr = time.time()
         self._time_prev = time.time()
 
-    def getPredictiedState(self):
+    def getPredictiedStates(self):
         return self._X_curr
 
     def getMeasuredStates(self):
         return self._Y_curr
 
-    def updateMeasurement(self):
+    def updateMeasurements(self, x, y):
         """
         Function updates the mouse state measurement, in this case just reading mouse position from PyAuotGUI
         """
-        
-        x, y = pyautogui.position()
         
         self._time_curr = time.time()
         d_time = self._time_curr - self._time_prev

@@ -3,35 +3,61 @@
 import sys
 import time
 import pyautogui
-import kalman_mouse as km
+
+import pyqtgraph as pg
+from pyqtgraph.Qt import QtCore, QtGui
+
+import kalman_filtered_mouse as kfm
+
+REFRESH_RATE = 1.0/30.0
+FITLER_TYPE = 'kalman_filter'
+
+class Filter:
+    def __init__(self, filter_type):
+
+        if filter_type == 'kalman_filter':
+            self._filter = kfm.KalmanFilteredMouse()
+
+        else:
+            print 'Filter type not found!'
+            exit()
+
+    def runFilter(self):
+        
+        self._filter.predict()
+        x, y = pyautogui.position()
+        self._filter.updateMeasurements(x, y)
+        self._filter.update()
+
+    def getMeasuredStates(self):
+
+        return self._filter.getMeasuredStates()
+
+    def getPredictiedStates(self):
+
+        return self._filter.getPredictiedStates()
+
 
 def main():
-    mouse_predictor = km.KalmanMouse()
+
+    print 'Press Ctrl+C to quit.'
+    
+    kf = Filter(FITLER_TYPE) 
 
     try:
         while True:
-            x, y = pyautogui.position()
+            kf.runFilter()
 
-            mouse_predictor.predict()
-            mouse_predictor.updateMeasurement()
-            mouse_predictor.update()
+            Y = kf.getMeasuredStates()
+            X = kf.getPredictiedStates()
+
+            positionStr = 'X: {0:d} Y: {1:d} Xp: {2:.2f} Yp: {3:.2f}'.format(int(Y[0,0]), int(Y[1,0]), X[0,0], X[1,0])
+            print positionStr,
+            print '\b' * (len(positionStr) + 2),
+            sys.stdout.flush()
             
-            X = mouse_predictor.getPredictiedState()
-            Y = mouse_predictor.getMeasuredStates()
+            time.sleep(REFRESH_RATE)
 
-            print "Measurement: ", Y
-            print "Current:", X
-            # print mouse_predictor.X_pred
-            # print mouse_predictor.X_prev
-            # print mouse_predictor.K
-
-            # positionStr = 'X: ' + str(x).rjust(4) + ' Y: ' + str(y).rjust(4)
-            # positionKalmanStr = ' X_km: ' + str(X[0,0]).rjust(4) + ' Y_km: ' + str(X[1,0]).rjust(4)
-            # print positionStr+positionKalmanStr
-            # print '\b' * (len(positionStr+positionKalmanStr) + 2),
-            # sys.stdout.flush()
-            
-            time.sleep(1.0/30.0)
     except KeyboardInterrupt:
         print '\n'
 
