@@ -2,6 +2,7 @@
 
 import sys
 import time
+from datetime import datetime
 
 from Queue import Queue
 from pyqtgraph.Qt import QtCore, QtGui
@@ -152,7 +153,7 @@ class Plot:
         self.plotMeasuredData(self._measX, self._measY)
         self.plotPredictedData(self._predX, self._predY)
 
-        positionStr = 'X: {0:.2f} Y: {1:.2f} Xp: {2:.2f} Yp: {3:.2f}'.format(self._measX[-1], self._measY[-1], self._predX[-1], self._predY[-1])
+        positionStr = 'X: {0:6.2f} Y: {1:6.2f} Xp: {2:6.2f} Yp: {3:6.2f}'.format(self._measX[-1], self._measY[-1], self._predX[-1], self._predY[-1])
         print positionStr,
         print '\b' * (len(positionStr) + 2),
         sys.stdout.flush()
@@ -240,11 +241,10 @@ class App(QtGui.QWidget):
         self.show()
 
     def _updateParam(self):
-        print 'PyQt5 button click\n'
+        print '{:50s}'.format(datetime.now().time().strftime('%m/%d/%y %I:%M:%S %p') + ' Updated Paramters')
 
     def _quitApp(self):
-        print '\n\nExit application.\n'
-        # self.QUIT = True
+        print '{:50s}'.format('Exit application')
         self.stopThread()
         QtCore.QCoreApplication.instance().quit()
 
