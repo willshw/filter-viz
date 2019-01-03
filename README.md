@@ -10,8 +10,9 @@ Kalman filter is the only filter available now. More filter can be added later i
 <p align="center"><img src="./img/app.gif" width="100%"></p>
 
 ### Dependencies:
-* [numpy](http://www.numpy.org/)
-* [pyqtgraph](http://www.pyqtgraph.org/)
+* Python 2.7
+* [NumPy](http://www.numpy.org/)
+* [PyQtGraph](http://www.pyqtgraph.org/)
 
 
 ### Resources
