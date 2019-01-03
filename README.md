@@ -7,17 +7,13 @@ This repository was initiated to study and code the filters for an estimation ba
 
 Kalman filter is the only filter available now. More filter can be added later in **filterLib.py**
 
----
+<p align="center"><img src="./img/app.gif" width="100%"></p>
 
 ### Dependencies:
 * [numpy](http://www.numpy.org/)
 * [pyqtgraph](http://www.pyqtgraph.org/)
 
----
 
-![app_window](./img/app.gif)
-
----
 ### Resources
 * Kalman Filter
     1. [Understanding the Basis of the Kalman Filter Via a Simple and Intuitive Derivation](https://courses.engr.illinois.edu/ece420/sp2017/UnderstandingKalmanFilter.pdf)
