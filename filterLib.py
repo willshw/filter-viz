@@ -1,8 +1,11 @@
 import numpy as np
 import copy
+from collections import OrderedDict
 
-# Filter parameters container class for better organization of parameters
-class FilterParameter:
+class FilterParameter(object):
+    """ Filter Parameter Class
+    To hold the parameter name, data and documentation for single parameter
+    """
 
     def __init__(self, name, data, doc=None):
         self._name = copy.deepcopy(name)
@@ -19,64 +22,66 @@ class FilterParameter:
     
     @data.setter
     def data(self, d):
+        print 'Set Parameter {0} to'.format(self._name)
+        print d, '\n'
+
         self._data = copy.deepcopy(d)
-        print 'Set Parameter {0} to {1}'.format(self._name, d) 
 
     @property
     def doc(self):
         return self._doc
 
-# KalmanFilter class handles all the calculation in the kalman filter
 class KalmanFilter:
+    """ Kalman Filter Class 
+    for containing filter related parameters and handle filter basic operations
+
+    states of mouse pointer: [x, y, dx, dy]
+    
+    State Transition Matrix:
+    A = [[1, 0, 0.25, 0],
+        [0, 1, 0, 0.25],
+        [0, 0, 1, 0],
+        [0, 0, 0, 1]]
+
+    Control Matrix:
+    B = indentity(4)
+
+    Measurement Matrix:
+    C = [[1, 0, 1, 0],
+        [0, 1, 0, 1],
+        [0, 0, 1, 0],
+        [0, 0, 0, 1]]
+
+    Action Uncertainty Matrix:
+    Q = [[0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0.1, 0],
+        [0, 0, 0, 0.1]]
+
+    Sensor Noise Matrix:
+    R = [[0.1, 0, 0, 0],
+        [0, 0.1, 0, 0],
+        [0, 0, 0.1, 0],
+        [0, 0, 0, 0.1]]
+    """
 
     def __init__(self):
-        """
-        states of mouse pointer: [x, y, dx, dy]
-        
-        State Transition Matrix:
-        A = [[1, 0, 0.25, 0],
-             [0, 1, 0, 0.25],
-             [0, 0, 1, 0],
-             [0, 0, 0, 1]]
-
-        Control Matrix:
-        B = indentity(4)
-
-        Measurement Matrix:
-        C = [[1, 0, 1, 0],
-             [0, 1, 0, 1],
-             [0, 0, 1, 0],
-             [0, 0, 0, 1]]
-
-        Action Uncertainty Matrix:
-        Q = [[0, 0, 0, 0],
-             [0, 0, 0, 0],
-             [0, 0, 0.1, 0],
-             [0, 0, 0, 0.1]]
-
-        Sensor Noise Matrix:
-        R = [[0.1, 0, 0, 0],
-             [0, 0.1, 0, 0],
-             [0, 0, 0.1, 0],
-             [0, 0, 0, 0.1]]
-        
-        """
-        self._params = {}
-        self._params.update({'A': FilterParameter('A', np.identity(4), 'State Transition Matrix')})
+        self._params = OrderedDict()
+        self._params['A'] = FilterParameter('A', np.identity(4), 'State Transition Matrix')
         self._params['A'].data[0, 2] = 0.25
         self._params['A'].data[1, 3] = 0.25
 
-        self._params.update({'B': FilterParameter('B', np.identity(4), 'Control Matrix')})
+        self._params['B'] = FilterParameter('B', np.identity(4), 'Control Matrix')
 
-        self._params.update({'C': FilterParameter('C', np.identity(4), 'Measurement Matrix')})
+        self._params['C'] = FilterParameter('C', np.identity(4), 'Measurement Matrix')
         self._params['C'].data[0, 2] = 1.0
         self._params['C'].data[1, 3] = 1.0
 
-        self._params.update({'Q': FilterParameter('Q', np.zeros((4, 4)), 'Action Uncertainty Matrix')})
+        self._params['Q'] = FilterParameter('Q', np.zeros((4, 4)), 'Action Uncertainty Matrix')
         self._params['Q'].data[2, 2] = 0.1
         self._params['Q'].data[3, 3] = 0.1
 
-        self._params.update({'R': FilterParameter('R', np.identity(4)*0.1, 'Sensor Noise Matrix')})
+        self._params['R'] = FilterParameter('R', np.identity(4)*0.1, 'Sensor Noise Matrix')
         
         # state
         self._X_curr = np.zeros((4, 1))
@@ -100,7 +105,7 @@ class KalmanFilter:
     def getParams(self):
         return self._params
     
-    def setParams(self, n, val):
+    def setParam(self, n, val):
         self._params[n].data = val
 
     def getPredictiedStates(self):
@@ -111,7 +116,7 @@ class KalmanFilter:
 
     def updateMeasurements(self, x, y, time):
         """
-        Function updates the mouse state measurement, in this case just reading mouse position from PyAuotGUI
+        Function updates the mouse state measurement, in this case just reading mouse position with/without noise injection from PyAuotGUI
         """
         
         self._time_curr = time
@@ -145,3 +150,6 @@ class KalmanFilter:
         
         self._X_curr = self._X_pred + self._K.dot(self._Y_curr - self._params['C'].data.dot(self._X_pred))
         self._P_curr = (np.identity(4) - self._K.dot(self._params['C'].data)).dot(self._P_pred)
+
+# Add filters here
+FILTERS = {'KalmanFilter': KalmanFilter, 'NoFilter': None}
